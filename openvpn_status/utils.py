@@ -13,7 +13,7 @@ from netaddr import EUI, mac_unix
 DATETIME_FORMAT_OPENVPN_V2_5 = u'%Y-%m-%d %H:%M:%S'
 DATETIME_FORMAT_OPENVPN_V2_4 = u'%a %b %d %H:%M:%S %Y'
 RE_VIRTUAL_ADDR_MAC = re.compile(
-    u'^{0}:{0}:{0}:{0}:{0}:{0}$'.format(u'[a-f0-9]{2}'), re.I)
+    r'^(?:[a-f0-9]{2}:){5}[a-f0-9]{2}(?:@\d+)?$', re.I)
 RE_VIRTUAL_ADDR_NETWORK = re.compile(u'/(\\d{1,3})$')
 RE_VIRTUAL_ADDR_CLIENT = re.compile(u'C$')
 
@@ -39,7 +39,7 @@ def parse_peer(peer):
 def parse_vaddr(virtual_addr):
     match = RE_VIRTUAL_ADDR_MAC.search(virtual_addr)
     if match:
-        return EUI(virtual_addr, dialect=mac_unix)
+        return EUI(virtual_addr.split('@')[0], dialect=mac_unix)
 
     match = RE_VIRTUAL_ADDR_NETWORK.search(virtual_addr)
     if match and 0 < int(match.group(1)) <= 128:
